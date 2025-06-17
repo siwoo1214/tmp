@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.jpaPrac1.mapper.UserMapper">
+
+    <resultMap id="userResultMap" type="com.example.jpaPrac1.Dto.User">
+        <id property="userId" column="user_id" />
+        <result property="userType" column="user_type" />
+        <result property="password" column="password" />
+        <result property="email" column="email" />
+        <result property="nickname" column="nickname" />
+        <result property="profileImageAddress" column="profile_image_address" />
+        <result property="activeType" column="active_type" />
+    </resultMap>
+
+    <select id="findAllUsers" resultMap="userResultMap">
+        SELECT * FROM user
+    </select>
+
+    <select id="findUserById" parameterType="String" resultMap="userResultMap">
+        SELECT * FROM user WHERE user_id = #{userId}
+    </select>
+
+    <insert id="insertUser" parameterType="com.example.jpaPrac1.Dto.User">
+        INSERT INTO user (
+        user_id, user_type, password, email, nickname,
+        profile_image_address, active_type
+        ) VALUES (
+        #{userId}, #{userType}, #{password}, #{email}, #{nickname},
+        #{profileImageAddress}, #{activeType}
+        )
+    </insert>
+
+</mapper>

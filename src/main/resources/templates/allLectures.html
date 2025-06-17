@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>강의 관리</title>
+</head>
+<body>
+<h1>전체 강의 목록</h1>
+<ul id="lectureList"></ul>
+
+<hr />
+
+<h2>강의 선택 조회</h2>
+<select id="lectureSelect">
+    <option value="">-- 강의 선택 --</option>
+</select>
+<div id="selectedLecture"></div>
+
+<hr />
+
+<h2>강의 등록</h2>
+<form id="lectureForm">
+    <input type="text" name="lectureId" placeholder="강의 ID" required />
+    <input type="text" name="uploaderId" placeholder="업로더 ID" required />
+    <input type="text" name="name" placeholder="강의명" required />
+    <input type="text" name="outline" placeholder="강의 개요" required />
+    <input type="text" name="introduction" placeholder="강의 소개" required />
+    <input type="number" name="price" placeholder="가격" required />
+    <input type="number" name="discountRate" placeholder="할인율 (선택)" />
+    <input type="number" name="difficulty" placeholder="난이도(1~5)" required />
+    <button type="submit">강의 등록</button>
+</form>
+
+<script>
+    const lectureList = document.getElementById('lectureList');
+    const lectureSelect = document.getElementById('lectureSelect');
+    const selectedLecture = document.getElementById('selectedLecture');
+
+    function fetchLectures() {
+        fetch('/lectures')
+            .then(res => res.json())
+            .then(lectures => {
+                lectureList.innerHTML = '';
+                lectures.forEach(lecture => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <strong>${lecture.name}</strong><br/>
+                        업로더 ID: ${lecture.uploaderId}<br/>
+                        개요: ${lecture.outline}<br/>
+                        소개: ${lecture.introduction}<br/>
+                        가격: ${lecture.price} 원<br/>
+                        할인율: ${lecture.discountRate ?? 0}%<br/>
+                        할인된 가격: ${lecture.price * (1 - (lecture.discountRate ?? 0) / 100)} 원<br/>
+                        난이도: ${lecture.difficulty}<br/>
+                        즐겨찾기 수: ${lecture.bookmark}<br/>
+                        수강생 수: ${lecture.student}<br/>
+                        등록일: ${new Date(lecture.uploadDate).toLocaleDateString()}
+                    `;
+                    lectureList.appendChild(li);
+
+                    const option = document.createElement('option');
+                    option.value = lecture.lectureId;
+                    option.textContent = lecture.name;
+                    lectureSelect.appendChild(option);
+                });
+            });
+    }
+
+    lectureSelect.addEventListener('change', () => {
+        const lectureId = lectureSelect.value;
+        if (!lectureId) {
+            selectedLecture.innerHTML = '';
+            return;
+        }
+
+        fetch(`/lectures/${lectureId}`)
+            .then(res => res.json())
+            .then(lecture => {
+                selectedLecture.innerHTML = `
+                    <p>ID: ${lecture.lectureId}</p>
+                    <p>이름: ${lecture.name}</p>
+                    <p>업로더: ${lecture.uploaderId}</p>
+                    <p>개요: ${lecture.outline}</p>
+                    <p>소개: ${lecture.introduction}</p>
+                    <p>가격: ${lecture.price}</p>
+                    <p>할인율: ${lecture.discountRate ?? 0}%</p>
+                    <p>난이도: ${lecture.difficulty}</p>
+                `;
+            });
+    });
+
+    document.getElementById('lectureForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData.entries());
+
+        data.price = parseInt(data.price);
+        data.discountRate = data.discountRate ? parseInt(data.discountRate) : null;
+        data.difficulty = parseInt(data.difficulty);
+        data.uploadDate = new Date().toISOString();
+
+        fetch('/lectures', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        }).then(() => {
+            e.target.reset();
+            fetchLectures();
+        });
+    });
+
+    fetchLectures();
+</script>
+</body>
+</html>

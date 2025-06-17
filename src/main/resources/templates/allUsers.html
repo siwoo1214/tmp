@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User 관리</title>
+</head>
+<body>
+<h1>전체 유저 목록</h1>
+<ul id="userList"></ul>
+
+<hr>
+
+<h2>유저 선택 조회</h2>
+<select id="userSelect">
+    <option value="">-- 유저 선택 --</option>
+</select>
+<div id="selectedUser"></div>
+
+<hr>
+
+<h2>유저 추가</h2>
+<form id="userForm">
+    <input type="text" name="userId" placeholder="userId" required />
+    <input type="text" name="nickname" placeholder="nickname" required />
+    <input type="email" name="email" placeholder="email" required />
+    <input type="password" name="password" placeholder="password" required />
+    <button type="submit">등록</button>
+</form>
+
+<script>
+    const userList = document.getElementById('userList');
+    const userSelect = document.getElementById('userSelect');
+    const selectedUser = document.getElementById('selectedUser');
+
+    function fetchUsers() {
+      fetch('/users')
+        .then(res => res.json())
+        .then(users => {
+          userList.innerHTML = '';
+          userSelect.innerHTML = '<option value="">-- 유저 선택 --</option>';
+          users.forEach(user => {
+            const li = document.createElement('li');
+            li.textContent = `${user.userId} - ${user.nickname}`;
+            userList.appendChild(li);
+
+            const option = document.createElement('option');
+            option.value = user.userId;
+            option.textContent = user.nickname;
+            userSelect.appendChild(option);
+          });
+        });
+    }
+
+    // 드롭다운 선택 시 유저 조회
+    userSelect.addEventListener('change', () => {
+      const userId = userSelect.value;
+      if (!userId) {
+        selectedUser.innerHTML = '';
+        return;
+      }
+      fetch(`/users/${userId}`)
+        .then(res => res.json())
+        .then(user => {
+          selectedUser.innerHTML = `
+            <p>ID: ${user.userId}</p>
+            <p>Nickname: ${user.nickname}</p>
+            <p>Email: ${user.email}</p>
+          `;
+        });
+    });
+
+    // 유저 추가
+    document.getElementById('userForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = Object.fromEntries(formData.entries());
+
+      fetch('/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      })
+        .then(() => {
+          e.target.reset();
+          fetchUsers(); // 목록 갱신
+        });
+    });
+
+    // 최초 호출
+    fetchUsers();
+</script>
+</body>
+</html>
