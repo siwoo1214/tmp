@@ -1,6 +1,7 @@
 package com.example.jpaPrac1.controller;
 
 import com.example.jpaPrac1.Dto.Lecture;
+import com.example.jpaPrac1.Dto.LectureWithFieldsDto;
 import com.example.jpaPrac1.service.LectureService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -28,24 +29,24 @@ public class LectureController {
     // 전체 강의 조회
     @ResponseBody
     @GetMapping
-    public List<Lecture> getAllLectures() {
-        for(Lecture list : lectureService.getAllLectures()){
+    public List<LectureWithFieldsDto> getAllLectures() {
+        for(LectureWithFieldsDto list : lectureService.getAllOfLectures()){
             System.out.println(list.toString());
         }
-        return lectureService.getAllLectures();
+        return lectureService.getAllOfLectures();
     }
 
     // 특정 강의 조회
     @ResponseBody
     @GetMapping("/{lectureId}")
-    public Lecture getLectureById(@PathVariable String lectureId) {
-        return lectureService.getLectureById(lectureId);
+    public LectureWithFieldsDto getLectureById(@PathVariable String lectureId) {
+        return lectureService.getLectureDetail(lectureId);
     }
 
     // 강의 등록
     @ResponseBody
     @PostMapping
-    public ResponseEntity<String> addLecture(@RequestBody Lecture lecture) {
+    public ResponseEntity<String> addLecture(@RequestBody LectureWithFieldsDto lecture) {
         lectureService.addLecture(lecture);
         return ResponseEntity.ok("Lecture added successfully.");
     }

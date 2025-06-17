@@ -2,6 +2,7 @@ package com.example.jpaPrac1.service;
 
 
 import com.example.jpaPrac1.Dto.Lecture;
+import com.example.jpaPrac1.Dto.LectureWithFieldsDto;
 import com.example.jpaPrac1.mapper.LectureMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,22 +19,32 @@ public class LectureServiceImpl implements LectureService {
         this.lectureMapper = lectureMapper;
     }
 
-    @Override
-    public List<Lecture> getAllLectures() {
-        return lectureMapper.findAllLectures();
-    }
+//    @Override
+//    public List<Lecture> getAllLectures() {
+//        return lectureMapper.findAllLectures();
+//    }
+//
+//    @Override
+//    public Lecture getLectureById(String lectureId) {
+//        return lectureMapper.findLectureById(lectureId);
+//    }
 
     @Override
-    public Lecture getLectureById(String lectureId) {
-        return lectureMapper.findLectureById(lectureId);
-    }
-
-    @Override
-    public void addLecture(Lecture lecture) {
+    public void addLecture(LectureWithFieldsDto lecture) {
         if (lecture.getUploadDate() == null) {
             lecture.setUploadDate(new Date());
         }
         lectureMapper.addLecture(lecture);
+    }
+
+    @Override
+    public LectureWithFieldsDto getLectureDetail(String lectureId) {
+        return lectureMapper.findLectureWithFields(lectureId);
+    }
+
+    @Override
+    public List<LectureWithFieldsDto> getAllOfLectures() {
+        return lectureMapper.findAllLecturesWithFields();
     }
 }
 

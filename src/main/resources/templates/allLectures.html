@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" />
     <title>강의 관리</title>
@@ -46,8 +46,11 @@
                     li.innerHTML = `
                         <strong>${lecture.name}</strong><br/>
                         업로더 ID: ${lecture.uploaderId}<br/>
+                        업로더 닉네임: ${lecture.nickname}<br/>
                         개요: ${lecture.outline}<br/>
                         소개: ${lecture.introduction}<br/>
+
+                        카테고리: ${lecture.interests}<br/>
                         가격: ${lecture.price} 원<br/>
                         할인율: ${lecture.discountRate ?? 0}%<br/>
                         할인된 가격: ${lecture.price * (1 - (lecture.discountRate ?? 0) / 100)} 원<br/>
@@ -56,6 +59,7 @@
                         수강생 수: ${lecture.student}<br/>
                         등록일: ${new Date(lecture.uploadDate).toLocaleDateString()}
                     `;
+
                     lectureList.appendChild(li);
 
                     const option = document.createElement('option');
@@ -80,6 +84,7 @@
                     <p>ID: ${lecture.lectureId}</p>
                     <p>이름: ${lecture.name}</p>
                     <p>업로더: ${lecture.uploaderId}</p>
+                    <p>카테고리: ${lecture.fields.join(', ')}<p/>
                     <p>개요: ${lecture.outline}</p>
                     <p>소개: ${lecture.introduction}</p>
                     <p>가격: ${lecture.price}</p>
